@@ -3,7 +3,7 @@
 // ============================================
 
 // TODO: Replace with your Google Apps Script Web App URL
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyznXkmqE7kfCHwTccmndKtWZ9lTcBm8g09ZIlPbSeYG4kqWUo39vWphieOsMrp5-nU/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymoQ1qqhdYPLQwI9ykzPjayDkBbDSX_LGYWdWty1nbbZ4xX6V-cIcVCqZVKfjtDZTT/exec";
 
 // Example: https://script.google.com/macros/s/AKfycbx.../exec
 
