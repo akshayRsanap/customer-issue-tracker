@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Issue Tracker - Google Sheets</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --success-color: #34a853;
+            --danger-color: #ea4335;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        
+        .card-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .card-header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.15);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-upload-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-label:hover {
+            background: #e9ecef;
+            border-color: var(--primary-color);
+        }
+        
+        .file-list {
+            margin-top: 10px;
+        }
+        
+        .file-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .google-badge {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .google-logo {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Info Banner -->
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Google Sheets Version!</strong> This version saves data to Google Sheets - no Azure setup needed!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboardSection">
+            <!-- User Info Card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="user-info">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    Welcome, <span id="userName">User</span>
+                                </h5>
+                                <small class="text-muted">
+                                    Logged in as: <span id="userEmail">Enter your email below</span>
+                                </small>
+                            </div>
+                            <div class="google-badge">
+                                <svg class="google-logo" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                </svg>
+                                <span>Google Sheets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue Form Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h1><i class="bi bi-clipboard-check me-2"></i>Report Customer Issue</h1>
+                    <p>Fill in the details below to log a new customer issue</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Alert Messages -->
+                    <div id="alertContainer"></div>
+
+                    <form id="issueForm">
+                        <!-- User Email (Required for identification) -->
+                        <div class="mb-4">
+                            <label for="userEmailInput" class="form-label">
+                                <i class="bi bi-envelope me-1"></i>Your Email *
+                            </label>
+                            <input type="email" class="form-control" id="userEmailInput" 
+                                placeholder="your.email@company.com" required>
+                            <small class="text-muted">This will be used to identify who raised the issue</small>
+                        </div>
+
+                        <!-- Theme -->
+                        <div class="mb-4">
+                            <label for="theme" class="form-label">
+                                <i class="bi bi-tag me-1"></i>Issue Theme *
+                            </label>
+                            <select class="form-select" id="theme" required>
+                                <option value="">Select a theme...</option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Billing Problem">Billing Problem</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Account Access">Account Access</option>
+                                <option value="Performance Issue">Performance Issue</option>
+                                <option value="Data Issue">Data Issue</option>
+                                <option value="Integration Problem">Integration Problem</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Issue Details -->
+                        <div class="mb-4">
+                            <label for="issueDetails" class="form-label">
+                                <i class="bi bi-file-text me-1"></i>Issue Details *
+                            </label>
+                            <textarea class="form-control" id="issueDetails" rows="5" 
+                                placeholder="Describe the issue in detail..." required></textarea>
+                            <small class="text-muted">Provide as much detail as possible to help resolve the issue quickly</small>
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="mb-4">
+                            <label for="assignedTo" class="form-label">
+                                <i class="bi bi-person-check me-1"></i>Assigned To *
+                            </label>
+                            <input type="text" class="form-control" id="assignedTo" value="sanaaks" required>
+                            <small class="text-muted">Default: sanaaks (you can change this)</small>
+                        </div>
+
+                        <!-- Attachments Note -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Attachments
+                            </label>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Note:</strong> File attachments will be added in the next version. 
+                                For now, please include file links or descriptions in the issue details above.
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-submit" id="submitButton">
+                                <i class="bi bi-send me-2"></i>Submit Issue
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="bi bi-gear me-2"></i>Setup Required</h5>
+                    <p class="mb-2">To use this dashboard, you need to:</p>
+                    <ol>
+                        <li>Create a Google Sheet with the required columns</li>
+                        <li>Set up a Google Apps Script web app</li>
+                        <li>Update the <code>SCRIPT_URL</code> in the code</li>
+                    </ol>
+                    <p class="mb-0">
+                        <i class="bi bi-book me-1"></i>
+                        See <strong>GOOGLE_SETUP_GUIDE.md</strong> for detailed instructions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application JavaScript -->
+    <script src="app-google.js"></script>
+</body>
+</html>
